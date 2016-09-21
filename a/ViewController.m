@@ -164,8 +164,8 @@
         [_bookVC.view layoutIfNeeded];
 
         for (Cell *cell in [_tableView visibleCells]) {
-            [cell.backView setNeedsLayout];
-            [cell.backView layoutIfNeeded];
+            CGRect tt = CGRectMake(16, 2, CGRectGetWidth(_tableView.frame) - 32, 40);
+            cell.backView.frame = tt;
         }
     } completion:^(BOOL finished) {
         [_bookVC.view removeFromSuperview];
