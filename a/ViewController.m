@@ -126,7 +126,7 @@
     [self addChildViewController:_bookVC];
     _bookVC.view.frame = _rectVCRt;
     [self.view addSubview:_bookVC.view];
-    [UIView animateWithDuration:1.5f animations:^{
+    [UIView animateWithDuration:0.5f animations:^{
         _bookVC.backBtn.alpha = 0.8;
         _bookVC.titleLbl.alpha = 1;
         _bookVC.leftLayout.priority = 249;
@@ -140,7 +140,7 @@
 
 - (void)closeBookVC
 {
-    [UIView animateWithDuration:1.5 animations:^{
+    [UIView animateWithDuration:0.5 animations:^{
         _bookVC.backBtn.alpha = 0;
         _bookVC.titleLbl.alpha = 0.5;
         _bookVC.leftLayout.priority = 750;
