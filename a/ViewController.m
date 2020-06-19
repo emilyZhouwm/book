@@ -15,7 +15,7 @@
     CGFloat _content;
 
     Cell *_listCell;
-    CGRect _rectVC;
+    CGRect _rectVCRt;
 
     BookController *_bookVC;
 }
@@ -110,19 +110,23 @@
 {
     _listCell = (Cell *)[_tableView cellForRowAtIndexPath:indexPath];
     _tableView.scrollEnabled = NO;
-
-    _rectVC = [_listCell convertRect:_listCell.backView.frame toView:nil];
-    CGRect rcVC = CGRectMake(_rectVC.origin.x, 20, _rectVC.size.width, self.view.frame.size.height - 30);
-
-    NSArray *indexUp = [_tableView indexPathsForRowsInRect:CGRectMake(0, 0, _tableView.frame.size.width, _listCell.frame.origin.y)];
-    NSArray *indexDown = [_tableView indexPathsForRowsInRect:CGRectMake(0, CGRectGetMaxY(_listCell.frame), _tableView.frame.size.width, CGRectGetHeight(_tableView.frame) -  CGRectGetMaxY(_listCell.frame))];
+    
+    BOOL x = FALSE;
+    if (@available(iOS 11.0, *)) {
+        if ([[UIApplication sharedApplication] delegate].window.safeAreaInsets.bottom > 0) {
+            x = TRUE;
+        }
+    }
+    
+    _rectVCRt = [_listCell convertRect:_listCell.backView.frame toView:nil];
+    CGRect rcVC = CGRectMake(_rectVCRt.origin.x, x ? 44 : 20, _rectVCRt.size.width, self.view.frame.size.height - (x ? 34 + 44 : 20 + 10));
 
     _bookVC = [BookController getVC];
     _bookVC.delegate = self;
     [self addChildViewController:_bookVC];
-    _bookVC.view.frame = _rectVC;
+    _bookVC.view.frame = _rectVCRt;
     [self.view addSubview:_bookVC.view];
-    [UIView animateWithDuration:0.5f animations:^{
+    [UIView animateWithDuration:1.5f animations:^{
         _bookVC.backBtn.alpha = 0.8;
         _bookVC.titleLbl.alpha = 1;
         _bookVC.leftLayout.priority = 249;
@@ -130,43 +134,21 @@
         _bookVC.view.frame = rcVC;
         [_bookVC.view setNeedsLayout];
         [_bookVC.view layoutIfNeeded];
-
-        for (NSInteger i = indexUp.count - 1; i >= 0; i--) {
-            NSIndexPath *index = indexUp[i];
-            Cell *temp = [_tableView cellForRowAtIndexPath:index];
-
-            CGRect tt = CGRectMake(40, -CGRectGetHeight(temp.frame) * (indexUp.count - i), CGRectGetWidth(_tableView.frame) - 80, CGRectGetHeight(temp.frame));
-
-            CGRect toRT = [temp convertRect:tt fromView:nil];
-            temp.backView.frame = toRT;
-        }
-        for (NSInteger i = 0; i < indexDown.count; i++) {
-            NSIndexPath *index = indexDown[i];
-            Cell *temp = [_tableView cellForRowAtIndexPath:index];
-
-            CGRect tt = CGRectMake(40, CGRectGetHeight(_tableView.frame) + CGRectGetHeight(temp.frame) * i, CGRectGetWidth(_tableView.frame) - 80, CGRectGetHeight(temp.frame));
-            CGRect toRT = [temp convertRect:tt fromView:nil];
-            temp.backView.frame = toRT;
-        }
     } completion:^(BOOL finished) {
     }];
 }
 
 - (void)closeBookVC
 {
-    [UIView animateWithDuration:0.5 animations:^{
+    [UIView animateWithDuration:1.5 animations:^{
         _bookVC.backBtn.alpha = 0;
         _bookVC.titleLbl.alpha = 0.5;
         _bookVC.leftLayout.priority = 750;
 
-        _bookVC.view.frame = _rectVC;
+        _bookVC.view.frame = _rectVCRt;
         [_bookVC.view setNeedsLayout];
         [_bookVC.view layoutIfNeeded];
-
-        for (Cell *cell in [_tableView visibleCells]) {
-            CGRect tt = CGRectMake(16, 2, CGRectGetWidth(_tableView.frame) - 32, 40);
-            cell.backView.frame = tt;
-        }
+        
     } completion:^(BOOL finished) {
         [_bookVC.view removeFromSuperview];
         [_bookVC removeFromParentViewController];
